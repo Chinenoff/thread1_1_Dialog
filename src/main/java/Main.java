@@ -1,36 +1,47 @@
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ExecutionException, InterruptedException {
 
-        ThreadGroup mainGroup = new ThreadGroup("main group");
-        //ThreadGroup genericGroup=new ThreadGroup("My generic group");
-        //Thread t1=new Thread(genericGroup,this);
-        //1
-        final MyThread myThread1 = new MyThread(mainGroup, "123");
-        myThread1.setName(" Я поток 1 ");
-        myThread1.start();
+        final int countMyCallable = 4;
 
-        //2
-        final MyThread myThread2 = new MyThread(mainGroup, "123");
-        myThread2.setName(" Я поток 2 ");
-        myThread2.start();
+        ExecutorService executorService =
+                Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
-        //3
-        final MyThread myThread3 = new MyThread(mainGroup, "123");
-        myThread3.setName(" Я поток 3 ");
-        myThread3.start();
+        //Создание и запуск одной задачи
+        //final MyCallable myCallable = new MyCallable();
+        //Future<Integer> future = executorService.submit(myCallable);
+        //System.out.println(future);
+        //executorService.shutdown();
 
-        //4
-        final MyThread myThread4 = new MyThread(mainGroup, "123");
-        myThread4.setName(" Я поток 4 ");
-        myThread4.start();
 
-        try {
-            Thread.sleep(15000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        //Создание и запуск нескольких задач invokeAll
+
+        // List<Future<Integer>> futures = executorService.invokeAll(callableTasks
+        // (countMyCallable));
+        //for (Future<Integer> result : futures
+        //) {
+        //    System.out.println("выведенных в консоль сообщений:" + result.get());
+        //}
+        //executorService.shutdown();
+
+        //Создание и запуск нескольких задач invokeAny
+        Integer result = executorService.invokeAny(callableTasks(countMyCallable));
+        System.out.println(" выведенных в консоль сообщений:" + result);
+        executorService.shutdown();
+    }
+
+    public static List<Callable<Integer>> callableTasks(int countMyCallable) {
+        List<Callable<Integer>> callableTasks = new ArrayList<>();
+        for (int i = 1; i <= countMyCallable; i++) {
+            MyCallable myCallable = new MyCallable(i);
+            callableTasks.add(myCallable);
         }
-
-        mainGroup.interrupt();
-
+        return callableTasks;
     }
 }
